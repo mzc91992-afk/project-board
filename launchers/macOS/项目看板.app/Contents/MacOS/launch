@@ -1,0 +1,36 @@
+#!/bin/bash
+# Project Board launcher (macOS). Opens the board in a chromeless app window.
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+HTML=""
+# Walk upwards: works both in the release zip and inside a cloned repo.
+for i in 1 2 3 4 5; do
+  DIR="$(cd "$DIR/.." && pwd)"
+  for c in "$DIR/项目看板.html" "$DIR/ProjectBoard.html"; do
+    if [ -f "$c" ]; then HTML="$c"; break 2; fi
+  done
+done
+# Fallback: first HTML that is not the Pages redirect.
+if [ -z "$HTML" ]; then
+  DIR="$(cd "$(dirname "$0")" && pwd)"
+  for i in 1 2 3 4 5; do
+    DIR="$(cd "$DIR/.." && pwd)"
+    for c in "$DIR"/*.html; do
+      if [ -f "$c" ] && [ "$(basename "$c")" != "index.html" ]; then HTML="$c"; break 2; fi
+    done
+  done
+fi
+if [ -z "$HTML" ]; then
+  osascript -e 'display alert "Board file not found" message "Keep 项目看板.html in the same folder as the launchers."' 2>/dev/null
+  exit 1
+fi
+FILEURL="$(python3 -c 'import sys,urllib.parse;print("file://"+urllib.parse.quote(sys.argv[1]))' "$HTML" 2>/dev/null || printf 'file://%s' "$HTML")"
+BROWSER=""
+for b in "Google Chrome" "Microsoft Edge" "Chromium" "Brave Browser" "Arc"; do
+  if [ -d "/Applications/$b.app" ] || [ -d "$HOME/Applications/$b.app" ]; then BROWSER="$b"; break; fi
+done
+if [ -n "$BROWSER" ]; then
+  open -a "$BROWSER" --args --app="$FILEURL" --window-size=1360,860
+else
+  open "$HTML"
+fi

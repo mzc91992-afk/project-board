@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* 看板模板静态校验：结构完整性、占位符状态、夹带内容检查。
-   用法: node scripts/verify_template.js [index.html 路径]
+   用法: node scripts/verify_template.js [项目看板.html 路径]
    退出码: 0 = 无 FAIL（WARN 不阻断）, 1 = 存在 FAIL。 */
 "use strict";
 
@@ -10,7 +10,7 @@ const vm = require("vm");
 
 const file = process.argv[2]
   ? path.resolve(process.argv[2])
-  : path.resolve(__dirname, "../assets/strategy-board/index.html");
+  : path.resolve(__dirname, "../项目看板.html");
 
 const results = [];
 const check = (ok, label, detail = "", level = "FAIL") => {
@@ -46,6 +46,22 @@ const hasRealKey = /wbpk_[A-Za-z0-9_]{20,}/.test(html);
 check(!hasRealKey, "未夹带真实发布密钥");
 check(!/\.app\.workbuddy\.host\b/.test(html), "未夹带内部部署域名");
 check(!/wbapp_[A-Za-z0-9]{16,}/.test(html), "未夹带应用 ID");
+// 旧品牌词（用转义拼写，避免校验规则自身被全仓扫描误报）
+const LEGACY_BRAND = new RegExp("[\\u6218\\u7565]|strat" + "egy", "i");
+check(!LEGACY_BRAND.test(html), "已完全去除旧品牌词（通用项目看板）");
+check(/<title>项目看板/.test(html), "标题为通用「项目看板」");
+
+// 3b. 可分发程序形态（仓库级检查，单独校验模板文件时跳过）
+const repo = path.resolve(__dirname, "..");
+if (path.resolve(file) === path.resolve(repo, "项目看板.html")) {
+  for (const [rel, label] of [
+    ["index.html", "在线版入口存在"],
+    ["launchers/macOS/项目看板.app/Contents/Info.plist", "macOS 启动器存在"],
+    ["launchers/Windows/启动项目看板.bat", "Windows 启动器存在"],
+    ["launchers/Linux/启动项目看板.sh", "Linux 启动器存在"],
+    ["launchers/使用说明.txt", "打包使用说明存在"],
+  ]) check(fs.existsSync(path.join(repo, rel)), label);
+}
 
 // 4. 零配置演示模式
 check(/DEMO ADAPTER START/.test(html) && /DEMO ADAPTER END/.test(html), "演示模式适配层完整");

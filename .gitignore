@@ -14,9 +14,10 @@ exports/
 *.docx
 *.pdf
 
-# 运行时
+# 运行时 / 构建产物（发布包走 GitHub Releases，不入库）
 node_modules/
 dist/
+*.zip
 .DS_Store
 Thumbs.db
 *.log

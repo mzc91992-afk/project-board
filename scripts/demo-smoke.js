@@ -18,7 +18,7 @@ try {
 }
 
 const HTML = fs.readFileSync(
-  path.resolve(__dirname, "../assets/strategy-board/index.html"), "utf8");
+  path.resolve(__dirname, "../项目看板.html"), "utf8");
 const wait = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
 function T(name, ok, extra) {

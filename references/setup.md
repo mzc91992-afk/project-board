@@ -4,8 +4,8 @@
 
 | 方式 | 怎么启动 | 需要什么 | 适用 |
 | --- | --- | --- | --- |
-| **演示模式（默认）** | 浏览器直接打开 `index.html` | 什么都没有 | 评估模板、给别人演示、试用全部交互 |
-| 强制演示 | `index.html?demo=1` | 同上 | 已填好云端配置仍想试用本地数据 |
+| **演示模式（默认）** | 浏览器直接打开 `项目看板.html`（或访问在线版 `index.html`） | 什么都没有 | 评估模板、给别人演示、试用全部交互 |
+| 强制演示 | `项目看板.html?demo=1` | 同上 | 已填好云端配置仍想试用本地数据 |
 | 云端模式 | 填入真实 `publishableKey`（或 `?live=1`） | 数据服务、对象存储、登录、建表、部署 | 正式团队使用 |
 
 模板靠 `PUBLIC_CONFIG.publishableKey` 是否为占位值 `REPLACE_WITH_YOUR_PUBLISHABLE_KEY` 自动判断，业务代码无需改动。演示模式把 `cloud` 换成本地数据层：数据存 `localStorage`（不可用时退内存）、免登录、自动载入虚构示例、全程不发对外请求；附件限 1 MB，不支持多设备同步与多人在线。
@@ -22,7 +22,7 @@
 
 ## 1. 配置 `PUBLIC_CONFIG`
 
-打开 `assets/strategy-board/index.html`，找到文件前部的配置块：
+打开 `项目看板.html`，找到文件前部的配置块：
 
 ```js
 const PUBLIC_CONFIG = {

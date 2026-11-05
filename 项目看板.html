@@ -35,11 +35,11 @@
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>战略项目看板 · 项目动态实时表</title>
-<meta name="description" content="通用战略项目动态实时表：项目状态按时间线留存、按重要紧急排序、一键生成汇报。">
+<title>项目看板 · 项目动态实时表</title>
+<meta name="description" content="通用项目动态实时表：项目状态按时间线留存、按重要紧急排序、一键生成汇报。">
 <meta name="format-detection" content="telephone=no">
 <meta property="og:type" content="website">
-<meta property="og:title" content="战略项目看板 · 项目动态实时表">
+<meta property="og:title" content="项目看板 · 项目动态实时表">
 <meta property="og:description" content="项目状态按时间线留存、按重要紧急排序、一键生成汇报。企业邮箱登录。">
 <!-- 云服务 SDK（内联，避免 CDN 不可达导致白屏） -->
 <script>
@@ -726,7 +726,7 @@ body.m-mode .m-wk .wk-btns button{width:38px;height:38px}
 .lead-row .chev{color:var(--text-3);font-size:15px;flex:none}
 .cat-sub{flex:1 1 100%;font-size:11.5px;color:var(--text-3);padding-left:10px;letter-spacing:.2px;word-break:break-all}
 .btxt{width:100%;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;line-height:1.6;background:var(--surface-2);color:var(--text);margin-bottom:4px}
-/* ---------- 2026-10-16a：销售/战略合作文字标注 + BOSS 确定按钮 ---------- */
+/* ---------- 2026-10-16a：销售/合作拓展文字标注 + BOSS 确定按钮 ---------- */
 .boss-ok{display:flex;align-items:center;gap:10px;padding:6px 0 2px}
 .boss-tip{font-size:12px;color:var(--text-3)}
 /* ---------- 2026-10-16f：明细表 Excel 式排版（对齐/字体/行距行高/列宽 + 单元格内滚动） ---------- */
@@ -769,8 +769,8 @@ body.m-mode .m-wk .wk-btns button{width:38px;height:38px}
 <!-- ============ LOGIN ============ -->
 <div id="loginView" class="login hide">
   <div class="lbox">
-    <h1>战略项目看板</h1>
-    <p class="sub">战略项目 · 项目动态实时表格</p>
+    <h1>项目看板</h1>
+    <p class="sub">项目动态实时表格</p>
     <div id="howToUse" class="warnbar" style="background:var(--surface-2);border:1px solid var(--line);color:var(--text-2)">
       <b>第一次使用？</b>
       点最下方「用邮箱验证码注册」→ 填邮箱 → 收 6 位验证码 → 设置一个不少于 6 位的密码 → 直接进入。<br>
@@ -850,7 +850,7 @@ body.m-mode .m-wk .wk-btns button{width:38px;height:38px}
     <div class="brand">
       <img class="brand-logo" id="brandLogo" title="回到首页" style="cursor:pointer" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==" alt="组织标识">
       <div class="brand-txt">
-        <h1>战略项目看板</h1>
+        <h1>项目看板</h1>
       </div>
     </div>
     <div class="online" id="onlineBox" title="查看在线成员 / 改显示名"><i class="dot off" id="onlineDot"></i><b id="onlineCnt">在线 —</b><span class="onames" id="onlineNames"></span></div>
@@ -1161,7 +1161,7 @@ const APP_VERSION = "1.0.0";
       '<div>' + tip + '</div>' +
       '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
       '<button id="sbDemoReset" style="border:1px solid #d9c98f;background:#fff;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px">重置演示数据</button>' +
-      '<a href="https://github.com/mzc91992-afk/strategy-board-skill#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B" target="_blank" rel="noopener" style="color:#8a6d1f;font-size:12px;align-self:center">接入自己的云 ↗</a>' +
+      '<a href="https://github.com/mzc91992-afk/project-board#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B" target="_blank" rel="noopener" style="color:#8a6d1f;font-size:12px;align-self:center">接入自己的云 ↗</a>' +
       '<button id="sbDemoClose" title="关闭" style="margin-left:auto;border:0;background:transparent;cursor:pointer;font-size:16px;color:#9c8c60">×</button>' +
       '</div>';
     document.body.appendChild(bar);
@@ -1386,7 +1386,7 @@ function tlStamp(r){
 const HZ_BUILTIN = [
   { k: "short", n: "短期", d: "年内对集团有交代" },
   { k: "mid", n: "中期", d: "1–3 年的机会与订单" },
-  { k: "long", n: "长期", d: "战略布局与培育" }
+  { k: "long", n: "长期", d: "长期布局与培育" }
 ];
 const HZ_BUILTIN_KEYS = HZ_BUILTIN.map(x => x.k);
 function hzList(){
@@ -3497,7 +3497,7 @@ function leadRow(p, wr, navId){
     '<div class="cat-main"><span class="cat-name" title="' + escapeHtml(tip) + '">' + escapeHtml(p.name) + '</span>' +
     '<span class="chev">›</span></div>' +
     '<div class="cat-marks">' + tag +
-    '<span class="npill ' + (t === "sales" ? "np-sales" : "np-bd") + '">' + (t === "sales" ? "销售类" : "战略合作") + '</span>' +
+    '<span class="npill ' + (t === "sales" ? "np-sales" : "np-bd") + '">' + (t === "sales" ? "销售类" : "合作拓展") + '</span>' +
     (nw ? '<span class="badge-new">NEW</span>' : "") +
     (upd ? '<span class="dot-upd" title="本周有更新"></span>' : "") +
     (quadZone(p) === "hi" ? '<span class="cat-star" title="重点突破项目">★</span>' : "") +
@@ -3547,7 +3547,7 @@ function leadTable(icon, title, sub, track, list, wr){
   return '<div class="lead-tbl"><div class="lead-tbl-h"><i class="lead-ico">' + icon + '</i><h2>' + title +
     '</h2><span class="sub">' + sub + '</span><span class="cnt">共 ' + total + ' 项</span></div>' +
     '<table><thead><tr><th>负责人</th><th>主导项目</th><th>协作项目</th><th title="本周新建的项目数">本周新增</th><th title="本周在项目状态上填写过动态才算更新">本周更新</th></tr></thead><tbody>' +
-    rows.map(r => '<tr data-goto="own:' + track + ':' + r.o + '" style="cursor:pointer" title="点开看 ' + P(r.o) + ' 的' + (track === "sales" ? "销售类" : "战略合作类") + '项目"><td><b>' + P(r.o) + '</b></td>' +
+    rows.map(r => '<tr data-goto="own:' + track + ':' + r.o + '" style="cursor:pointer" title="点开看 ' + P(r.o) + ' 的' + (track === "sales" ? "销售类" : "合作拓展类") + '项目"><td><b>' + P(r.o) + '</b></td>' +
       [r.lead, r.coop, r.nn, r.nu].map(n => '<td class="num' + (n ? " on" : "") + '">' + (n || "·") + '</td>').join("") + '</tr>').join("") +
     '</tbody></table></div>';
 }
@@ -3582,7 +3582,7 @@ function viewCats(list){
     '<div class="kpi c-sub" data-kpi="subst"' + kw("subst") + ' title="筛选本周期有实质性推进动态的项目"><b>' + nSub + '</b><span>本周实质推进</span>' + sub(nSub - nSubPrev) + krz + '</div>' +
     '<div class="kpi c-key" data-kpi="hi"' + kw("hi") + ' title="筛选重点突破项目"><b>' + nKey + '</b><span>优先项目</span>' + krz + '</div>' +
     '<div class="kpi" data-kpi="sales"' + kw("sales") + ' title="筛选销售类项目"><b>' + nSales + '</b><span>销售类</span>' + krz + '</div>' +
-    '<div class="kpi" data-kpi="bd"' + kw("bd") + ' title="筛选战略合作类项目"><b>' + nBd + '</b><span>战略合作类</span>' + krz + '</div>' +
+    '<div class="kpi" data-kpi="bd"' + kw("bd") + ' title="筛选合作拓展类项目"><b>' + nBd + '</b><span>合作拓展类</span>' + krz + '</div>' +
     '<div class="kpi c-ap" data-kpi="ap"' + kw("ap") + ' title="筛选需董事长审批的项目（不遵循周期，一直保持）"><b>' + nAp + '</b><span>需审批</span>' + krz + '</div></div>' +
     '<div class="lead-legend">图例：<i class="dot-upd"></i> 本周项目状态更新（项目状态动态 / 下一步动作有更新）<span class="lg-sep">|</span>' +
     '<span class="badge-new">NEW</span> 本周新增项目<span class="lg-sep">|</span>' +
@@ -3602,7 +3602,7 @@ function viewCats(list){
   });
   h += '</div><div class="lead-side">' +
     leadTable("📈", "销售类项目", "合同与销售机会", "sales", list, wr) +
-    leadTable("🤝", "战略合作类项目", "BD / 商务拓展", "bd", list, wr) +
+    leadTable("🤝", "合作拓展类项目", "BD / 商务拓展", "bd", list, wr) +
     '<div class="lead-note">按住项目可拖到别的分类（需先在工具栏解锁拖动） · 点分类标题可直接改名 · 点项目可查看并填写每周进展<br>以上数据为项目进度统计，仅供参考</div></div></div>';
   return h;
 }
@@ -3983,7 +3983,7 @@ function openDetail(id){
         '<span class="tag ' + (p.status === "active" ? hzTagClass(p.horizon) : (p.status === "paused" ? "t-paused" : "t-closed")) + '">' +
           (p.status === "active" ? escapeHtml(hzName(p.horizon)) : STATUS[p.status]) + '</span>' +
         '<span class="pill" style="border-left:3px solid ' + (track === "sales" ? "var(--blue)" : "#8b5cf6") + '">' +
-          (track === "sales" ? "销售类" : "战略合作类") + '</span>' +
+          (track === "sales" ? "销售类" : "合作拓展类") + '</span>' +
       '</div>' +
       '<div class="dgrid">' +
         kv("负责人", escapeHtml(P(p.owner_label) || "未指派")) +
@@ -4065,12 +4065,12 @@ function navLabel(f){
   if (f === "new") return "本周新增";
   if (f === "hi") return "重点突破项目";
   if (f === "sales") return "销售类项目";
-  if (f === "bd") return "战略合作类项目";
+  if (f === "bd") return "合作拓展类项目";
   if (f === "subst") return "实质推进项目（本周期有实质性推进动态）";
   if (f === "ap") return "需董事长审批的项目";
   if (f && f.indexOf("own:") === 0) {
     const parts = f.split(":");
-    return parts.slice(2).join(":") + " 主导的" + (parts[1] === "sales" ? "销售类" : "战略合作类") + "项目";
+    return parts.slice(2).join(":") + " 主导的" + (parts[1] === "sales" ? "销售类" : "合作拓展类") + "项目";
   }
   return "";
 }
@@ -4502,7 +4502,7 @@ function exportTableXlsx(){
   const bytes = xlsxRows([heads, ...rows]);
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
-  a.download = "战略项目明细_" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + ".xlsx";
+  a.download = "项目明细_" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + ".xlsx";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
@@ -4514,7 +4514,7 @@ const DEMO = [
   { name: "示例园区 · 废气治理改造", category: "工程总包", horizon: "short", stage: "方案/报价", counterparty: "示例客户甲", contact_label: "联系人甲", importance: 5, urgency: 5, amount_plan: 300, amount_ytd: 0, owner_label: "成员甲", summary: "客户计划年内完成改造，拟分两个标段实施；方案由我方编制，暂无明确竞争对手。", next_action: "确认招标范围与报价边界，避免重复计价" },
   { name: "示例客户 · 年度运维服务", category: "运营服务", horizon: "mid", stage: "对接拜访", counterparty: "示例客户甲", importance: 5, urgency: 3, amount_plan: 800, owner_label: "成员乙", summary: "运维服务意向已明确，本年度先落一个标段，后续按年度框架协议滚动。", next_action: "把服务边界与年度费用口径量化成方案" },
   { name: "示例专项 · 绿色改造配套", category: "工程总包", horizon: "short", stage: "方案/报价", counterparty: "示例客户乙", importance: 5, urgency: 4, amount_plan: 1200, owner_label: "成员丙", summary: "专项体量较大，已与业主完成首轮对接；建议聚焦一两个重点事项，避免范围过度扩张。", next_action: "筛选重点事项并锁定推进节奏" },
-  { name: "示例合资公司设立筹备", category: "战略合作", horizon: "short", stage: "商务谈判", counterparty: "示例资源方", importance: 5, urgency: 5, amount_plan: 0, owner_label: "成员甲", summary: "股权比例与合作边界尚在磋商，前置条件为两个先行项目落地；对方主体资格待书面确认。", next_action: "确认合作主体、排他条款与出资节奏" },
+  { name: "示例合资公司设立筹备", category: "合作拓展", horizon: "short", stage: "商务谈判", counterparty: "示例资源方", importance: 5, urgency: 5, amount_plan: 0, owner_label: "成员甲", summary: "股权比例与合作边界尚在磋商，前置条件为两个先行项目落地；对方主体资格待书面确认。", next_action: "确认合作主体、排他条款与出资节奏" },
   { name: "示例实验室 · 产能切分", category: "新业务", horizon: "mid", stage: "商务谈判", counterparty: "示例实验室", importance: 4, urgency: 3, amount_plan: 0, owner_label: "成员丁", summary: "产品定型持续变更导致交付节点顺延；已安排合作方先行学习工序。", next_action: "与合作方量化投入、分工与一年期评价标准" },
   { name: "示例矿区 · 巡检服务试点", category: "新业务", horizon: "mid", stage: "对接拜访", counterparty: "示例能源集团", contact_label: "联系人乙", importance: 4, urgency: 3, amount_plan: 0, owner_label: "成员乙", summary: "经合作方引荐对接机电负责人，拟以服务订阅模式开展试点。", next_action: "推动 3–6 个月试点先落地，再谈规模复制" },
   { name: "示例金属资源回收", category: "资源回收", horizon: "long", stage: "对接拜访", counterparty: "示例化工企业", contact_label: "联系人丙", importance: 4, urgency: 3, amount_plan: 0, owner_label: "成员丙", summary: "原料渠道与海外资源尚在摸底，已完成一轮供应商交流。", next_action: "形成汇报材料并安排下一轮技术交流" },
@@ -4751,7 +4751,7 @@ function openDrawer(id){
         <div class="frow"><label>负责人（可多选；<b>按输入先后排序</b>——第一个为主要负责人，其余为协作人；× 可删除该人）</label>${chipsHtml("eOwner", "owner", splitNames(p.owner_label))}</div>
       </div>
             <div class="f2">
-        <div class="frow"><label>项目类型</label><select id="eTrack" data-as="track"><option value="sales"${p.track !== "bd" ? " selected" : ""}>销售类（合同与销售机会）</option><option value="bd"${p.track === "bd" ? " selected" : ""}>战略合作类（BD / 商务拓展）</option></select></div>
+        <div class="frow"><label>项目类型</label><select id="eTrack" data-as="track"><option value="sales"${p.track !== "bd" ? " selected" : ""}>销售类（合同与销售机会）</option><option value="bd"${p.track === "bd" ? " selected" : ""}>合作拓展类（BD / 商务拓展）</option></select></div>
         <div class="frow"><label>首页分类</label><select id="eNav" data-as="nav_col"><option value="">自动（按业务方向）</option>${LEAD_COLS.map(c => '<option value="' + c.id + '"' + (p.nav_col === c.id ? ' selected' : '') + '>' + escapeHtml(leadName(c)) + '</option>').join("")}</select></div>
       </div>
 <div class="f2">
@@ -5055,7 +5055,7 @@ $("btnNew").onclick = () => {
         <div class="frow"><label>今年已落地（万元）</label><input id="nYtd" type="number" placeholder="可留空"></div>
       </div>
             <div class="f2">
-        <div class="frow"><label>项目类型</label><select id="nTrack"><option value="sales">销售类（合同与销售机会）</option><option value="bd">战略合作类（BD / 商务拓展）</option></select></div>
+        <div class="frow"><label>项目类型</label><select id="nTrack"><option value="sales">销售类（合同与销售机会）</option><option value="bd">合作拓展类（BD / 商务拓展）</option></select></div>
         <div class="frow"><label>首页分类</label><select id="nNav"><option value="">自动（按业务方向）</option>${LEAD_COLS.map(c => '<option value="' + c.id + '">' + escapeHtml(leadName(c)) + '</option>').join("")}</select></div>
       </div>
       <div class="frow"><label>一句话简介</label><textarea id="nSum" data-ta="nSum" style="min-height:56px"></textarea></div>
@@ -5113,7 +5113,7 @@ $("btnNew").onclick = () => {
 };
 
 /* ================= horizon settings ================= */
-/* 周期叫法各公司不一样，所以把「短期/中期/长期」做成可改名的配置，还能加自定义周期（比如"战略储备"） */
+/* 周期叫法各公司不一样，所以把「短期/中期/长期」做成可改名的配置，还能加自定义周期（比如"长期储备"） */
 $("btnHzSet").onclick = () => {
   let list = hzList();
   const isBuiltin = k => HZ_BUILTIN_KEYS.indexOf(k) >= 0;
@@ -5179,7 +5179,7 @@ $("btnHzSet").onclick = () => {
   bindDel();
   $("hzAdd").onclick = () => {
     syncInputs();
-    const n = (prompt("新周期叫什么？例：战略储备 / 已立项") || "").trim();
+    const n = (prompt("新周期叫什么？例：长期储备 / 已立项") || "").trim();
     if (!n) return;
     list.push({ k: "c" + Date.now().toString(36), n, d: "" });
     paint();
@@ -5225,7 +5225,7 @@ $("btnReport").onclick = () => {
   const hzBlocks = groups.filter(g => g.list.length)
     .map((g, i) => `【${"一二三四五六七八"[i] || (i + 1)}、${g.name}】\n${g.list.map(line).join("\n")}`)
     .join("\n\n") || "（无进行中项目）";
-  const txt = `战略项目动态｜${now}
+  const txt = `项目动态｜${now}
 —— 进行中 ${act.length} 个（${hzSummary}），预计订单总额 ${money(total)}，今年已落地 ${money(ytd)}
 
 ${hzBlocks}
@@ -5266,7 +5266,7 @@ ${(() => {
   $("repDl").onclick = () => {
     const blob = new Blob([$("repTxt").value], { type: "text/markdown;charset=utf-8" });
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = `战略项目动态_${now}.md`; a.click();
+    a.href = URL.createObjectURL(blob); a.download = `项目动态_${now}.md`; a.click();
   };
 };
 

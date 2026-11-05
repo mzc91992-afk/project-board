@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=项目看板
+Comment=零配置项目动态看板
+Exec=bash -c 'cd "$(dirname %k)/../.." && bash launchers/Linux/启动项目看板.sh'
+Terminal=false
+Categories=Office;ProjectManagement;
