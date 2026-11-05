@@ -10,8 +10,10 @@
 
 | 下载 | 适合 |
 | --- | --- |
-| **[⬇ 项目看板.html](https://github.com/mzc91992-afk/project-board/releases/latest/download/项目看板.html)** | 大多数人。约 390 KB 单文件，Windows / macOS / Linux 通用，双击即用 |
-| **[⬇ 项目看板-桌面版.zip](https://github.com/mzc91992-afk/project-board/releases/latest/download/项目看板-桌面版.zip)** | 想要独立窗口（无浏览器地址栏、看起来像原生程序）：内含三个平台的启动器 |
+| **[⬇ ProjectBoard.html](https://github.com/mzc91992-afk/project-board/releases/latest/download/ProjectBoard.html)** | 大多数人。约 390 KB 单文件，Windows / macOS / Linux 通用，双击即用 |
+| **[⬇ ProjectBoard-Desktop.zip](https://github.com/mzc91992-afk/project-board/releases/latest/download/ProjectBoard-Desktop.zip)** | 想要独立窗口（无浏览器地址栏、看起来像原生程序）：内含三个平台的启动器 |
+
+> Release 资产名用 ASCII 是为了保证各平台下载链接稳定；下载后文件叫什么名字都不影响使用，想叫「项目看板.html」直接改名即可。仓库源码里的主程序本身就叫 `项目看板.html`。
 
 只想要源码里的那个文件，也可以用 raw 直链：
 
