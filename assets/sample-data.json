@@ -1,0 +1,54 @@
+{
+  "_note": "纯虚构示例数据，仅用于验证导入格式。不对应任何真实组织、人员或项目。",
+  "projects": [
+    {
+      "name": "示例园区 · 废气治理改造",
+      "category": "工程总包",
+      "horizon": "short",
+      "status": "active",
+      "stage": "方案/报价",
+      "counterparty": "示例客户甲",
+      "contact_label": "联系人甲",
+      "owner_label": "成员甲",
+      "importance": 5,
+      "urgency": 5,
+      "amount_plan": 300,
+      "amount_ytd": 0,
+      "landing_month": null,
+      "summary": "客户计划年内完成改造，拟分两个标段实施；方案由我方编制，暂无明确竞争对手。",
+      "next_action": "确认招标范围与报价边界，避免重复计价"
+    },
+    {
+      "name": "示例客户 · 年度运维服务",
+      "category": "运营服务",
+      "horizon": "mid",
+      "status": "active",
+      "stage": "对接拜访",
+      "counterparty": "示例客户甲",
+      "owner_label": "成员乙",
+      "importance": 5,
+      "urgency": 3,
+      "amount_plan": 800,
+      "amount_ytd": 0,
+      "landing_month": null,
+      "summary": "运维服务意向已明确，本年度先落一个标段，后续按年度框架协议滚动。",
+      "next_action": "把服务边界与年度费用口径量化成方案"
+    },
+    {
+      "name": "示例装备合作线索",
+      "category": "新业务",
+      "horizon": "long",
+      "status": "paused",
+      "stage": "线索/信息",
+      "counterparty": "示例油田服务方",
+      "owner_label": "成员甲",
+      "importance": 3,
+      "urgency": 2,
+      "amount_plan": 0,
+      "amount_ytd": 0,
+      "landing_month": null,
+      "summary": "新规对业务角色有约束，需先明确自身在项目中的定位与可交付范围。",
+      "next_action": "明确业务模式：产品代理还是技术服务"
+    }
+  ]
+}

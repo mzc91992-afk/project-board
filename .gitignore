@@ -1,0 +1,27 @@
+# 本地配置：可能包含真实凭证，禁止入库
+config.local.*
+.env
+.env.*
+*.local.html
+**/index.local.html
+
+# 真实业务数据导出，禁止入库
+data/
+exports/
+*.xlsx
+*.xls
+*.csv
+*.docx
+*.pdf
+
+# 运行时
+node_modules/
+dist/
+.DS_Store
+Thumbs.db
+*.log
+__pycache__/
+*.pyc
+.pytest_cache/
+.idea/
+.vscode/
