@@ -919,6 +919,265 @@ const PUBLIC_CONFIG = {
   publishableKey: "REPLACE_WITH_YOUR_PUBLISHABLE_KEY"
 };
 const APP_VERSION = "1.0.0";
+
+/* ==================== DEMO ADAPTER START ====================
+   零配置演示模式：publishableKey 仍是占位值时自动启用。
+   做法：只在 SDK 之下替换 cloud 实例，业务代码一行不改；
+   填入真实 publishableKey（或 ?live=1）后自动回到云端模式。
+   ?demo=1 强制演示，?reset=demo 清空本机演示数据。
+   ============================================================ */
+(function () {
+  "use strict";
+  var QS = new URLSearchParams(location.search);
+  var PLACEHOLDER = "REPLACE_WITH_YOUR_PUBLISHABLE_KEY";
+  var DEMO_ON = QS.get("live") === "1" ? false :
+    (QS.get("demo") === "1" || !PUBLIC_CONFIG.publishableKey ||
+      PUBLIC_CONFIG.publishableKey === PLACEHOLDER);
+  window.SB_DEMO = DEMO_ON;
+
+  if (!DEMO_ON) return;
+
+  /* ---- 本机存储：file:// 下 localStorage 可能不可用，自动退回内存 ---- */
+  var KEY = "sb_demo_db_v1", MEM = {};
+  function sGet(k) { try { return localStorage.getItem(k); } catch (e) { return MEM[k] || null; } }
+  function sSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { MEM[k] = v; } }
+  function sDel(k) { try { localStorage.removeItem(k); } catch (e) { delete MEM[k]; } }
+  if (QS.get("reset") === "demo") sDel(KEY);
+
+  var TABLES = ["projects", "project_notes", "project_logs", "project_nexts",
+                "project_files", "app_settings", "presence", "app_diag"];
+  var DB = null;
+  function now() { return new Date().toISOString(); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function seedDb() {
+    var d = { _seq: 1, _files: {} };
+    TABLES.forEach(function (t) { d[t] = []; });
+    var demo = (typeof DEMO !== "undefined" && Array.isArray(DEMO)) ? DEMO : [];
+    demo.forEach(function (x, i) {
+      d.projects.push(Object.assign({
+        id: d._seq++, status: "active", created_at: now(), updated_at: now(),
+        deleted_at: null, amount_ytd: 0, landing_month: null,
+        next_action_at: null, owner_id: "demo-user", sort_key: i, order_key: i
+      }, x));
+    });
+    return d;
+  }
+  function db() {
+    if (!DB) {
+      try { var raw = sGet(KEY); DB = raw ? JSON.parse(raw) : seedDb(); }
+      catch (e) { DB = seedDb(); }
+      TABLES.forEach(function (t) { if (!Array.isArray(DB[t])) DB[t] = []; });
+      if (!DB._files) DB._files = {};
+      if (!DB._seq) DB._seq = DB.projects.reduce(function (m, r) {
+        return Math.max(m, Number(r.id) || 0);
+      }, 0) + 1;
+      save();
+    }
+    return DB;
+  }
+  function save() { try { sSet(KEY, JSON.stringify(db())); } catch (e) {} }
+
+  /* ---- PostgREST 风格链式 builder：await 时才真正执行 ---- */
+  function Builder(table, op, payload) {
+    this.t = table; this.op = op || "select"; this.payload = payload;
+    this.filters = []; this.ord = null; this.lim = null; this.conflict = "id";
+  }
+  var P = Builder.prototype;
+  P.select = function () { return this; };              /* 仅表示"返回受影响行"，不改操作 */
+  P.insert = function (rows) { this.op = "insert"; this.payload = rows; return this; };
+  P.update = function (patch) { this.op = "update"; this.payload = patch; return this; };
+  P.upsert = function (row, opt) {
+    this.op = "upsert"; this.payload = row;
+    this.conflict = (opt && opt.onConflict) || "id"; return this;
+  };
+  P["delete"] = function () { this.op = "delete"; return this; };
+  P.eq = function (c, v) { this.filters.push(function (r) { return String(r[c]) === String(v); }); return this; };
+  P["in"] = function (c, arr) {
+    var a = Array.isArray(arr) ? arr : [];
+    this.filters.push(function (r) { return a.some(function (v) { return String(v) === String(r[c]); }); });
+    return this;
+  };
+  function cmpFilter(fn) { return function (c, v) { this.filters.push(function (r) { return fn(r[c], v); }); return this; }; }
+  P.gt = cmpFilter(function (a, v) { return a != null && String(a) > String(v); });
+  P.gte = cmpFilter(function (a, v) { return a != null && String(a) >= String(v); });
+  P.lt = cmpFilter(function (a, v) { return a != null && String(a) < String(v); });
+  P.lte = cmpFilter(function (a, v) { return a != null && String(a) <= String(v); });
+  P.order = function (c, opt) { this.ord = { c: c, desc: !!(opt && opt.ascending === false) }; return this; };
+  P.limit = function (n) { this.lim = n; return this; };
+  P.then = function (resolve) {
+    try { resolve(exec(this)); }
+    catch (e) { resolve({ data: null, error: e }); }
+  };
+
+  function exec(b) {
+    var d = db();
+    var rows = d[b.t] || (d[b.t] = []);
+    var match = function () { return rows.filter(function (r) { return b.filters.every(function (f) { return f(r); }); }); };
+    var out;
+    if (b.op === "insert") {
+      var list = Array.isArray(b.payload) ? b.payload : [b.payload];
+      out = list.map(function (raw) {
+        var row = Object.assign({ id: d._seq++, created_at: now(), updated_at: now() }, raw);
+        rows.push(row); return clone(row);
+      });
+    } else if (b.op === "update") {
+      out = match().map(function (r) { Object.assign(r, b.payload); return clone(r); });
+    } else if (b.op === "upsert") {
+      var key = b.conflict, val = String(b.payload[key]);
+      var hit = rows.filter(function (r) { return String(r[key]) === val; })[0];
+      if (hit) { Object.assign(hit, b.payload); out = [clone(hit)]; }
+      else {
+        var row2 = Object.assign({ id: d._seq++, created_at: now() }, b.payload);
+        rows.push(row2); out = [clone(row2)];
+      }
+    } else if (b.op === "delete") {
+      var hits = match(), ids = {};
+      hits.forEach(function (r) { ids[r.id] = 1; });
+      d[b.t] = rows.filter(function (r) { return !ids[r.id]; });
+      out = hits.map(clone);
+    } else {
+      out = match().map(clone);
+      if (b.ord) {
+        var c = b.ord.c, desc = b.ord.desc;
+        out.sort(function (a, z) {
+          var A = a[c], Z = z[c];
+          if (A == null && Z == null) return 0;
+          if (A == null) return desc ? 1 : -1;
+          if (Z == null) return desc ? -1 : 1;
+          var k = (typeof A === "number" && typeof Z === "number") ? (A - Z) : String(A).localeCompare(String(Z));
+          return desc ? -k : k;
+        });
+      }
+      if (b.lim != null) out = out.slice(0, b.lim);
+    }
+    save();
+    return { data: out, error: null };
+  }
+
+  /* ---- 附件：1 MB 以内转 dataURL 存本机，预览/下载照常可用 ---- */
+  var MAX_FILE = 1024 * 1024;
+  function readAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var fr = new FileReader();
+        fr.onload = function () { resolve(String(fr.result)); };
+        fr.onerror = function () { reject(new Error("读取文件失败")); };
+        fr.readAsDataURL(file);
+      } catch (e) { reject(e); }
+    });
+  }
+  function dataUrlToBlob(u) {
+    var parts = String(u).split(",");
+    var mime = (parts[0].match(/data:([^;]+)/) || [])[1] || "application/octet-stream";
+    var bin = atob(parts[1] || ""), arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
+  function result(v) { return { then: function (res) { res(v); } }; }
+  function upload(path, file) {
+    return { then: function (res) {
+      if (file && file.size > MAX_FILE) {
+        res({ data: null, error: { message: "演示模式仅支持 1 MB 以内的附件（配置云端后无限制）" } });
+        return;
+      }
+      readAsDataUrl(file).then(function (u) {
+        db()._files[path] = u; save(); res({ data: { path: path }, error: null });
+      }).catch(function (e) { res({ data: null, error: e }); });
+    } };
+  }
+  var bucket = {
+    upload: upload,
+    createSignedUploadUrl: function (path) { return result({ data: { token: "demo", path: path }, error: null }); },
+    uploadToSignedUrl: function (path, token, file) { return upload(path, file); },
+    download: function (path) {
+      var u = db()._files[path];
+      return result(u ? { data: dataUrlToBlob(u), error: null } : { data: null, error: { message: "文件不存在" } });
+    },
+    createSignedUrl: function (path) {
+      return result({ data: { signedUrl: db()._files[path] || "" }, error: null });
+    },
+    remove: function (paths) {
+      var list = Array.isArray(paths) ? paths : [paths];
+      list.forEach(function (p) { delete db()._files[p]; });
+      save(); return result({ data: list, error: null });
+    }
+  };
+
+  /* ---- 免登录会话 ---- */
+  var USER = { id: "demo-user", email: "demo@example.com", user_metadata: {} };
+  var SESSION = { user: USER, access_token: "demo-token", token: { access_token: "demo-token" } };
+  var localCloud = {
+    auth: {
+      getSession: async function () { return { data: SESSION, error: null }; },
+      getUser: async function () { return { data: { user: USER }, error: null }; },
+      getAccessToken: async function () { return { access_token: "demo-token" }; },
+      signInWithPassword: async function () { return { data: SESSION, error: null }; },
+      signOut: async function () { return { error: null }; },
+      sendOtp: async function () { return { data: {}, error: null }; },
+      verifyOtp: async function () { return { data: SESSION, error: null }; },
+      handleWechatWebCallback: async function () { return {}; },
+      onAuthStateChange: function () { return { data: { subscription: { unsubscribe: function () {} } } }; }
+    },
+    database: { from: function (t) { return new Builder(t); } },
+    storage: {
+      userPath: function (uid, name) { return "demo/" + uid + "/" + name; },
+      from: function () { return bucket; }
+    }
+  };
+
+  /* SDK 是 getter 导出的只读对象，整体替换全局 var 才是最稳的拦截点 */
+  window.WorkBuddyCloud = { createWorkBuddyCloud: function () { return localCloud; } };
+  /* 演示模式不产生任何对外请求，也不弹「访问地址不对」 */
+  if (typeof diagPush === "function") diagPush = async function () {};
+  if (typeof xhrFetch === "function") xhrFetch = async function () {
+    return { ok: true, status: 200, text: async function () { return "[]"; }, json: async function () { return []; } };
+  };
+  if (typeof checkOrigin === "function") checkOrigin = function () {};
+  if (typeof xhrUpload === "function") xhrUpload = async function () {
+    return { ok: false, status: 0, text: "demo mode" };
+  };
+  if (typeof rawUpload === "function") rawUpload = async function () {
+    return { ok: false, status: 0, text: "demo mode" };
+  };
+
+  /* ---- 右下角提示卡：不遮挡界面，可一键重置 ---- */
+  function canPersist() {
+    try { localStorage.setItem("__sb_probe__", "1"); localStorage.removeItem("__sb_probe__"); return true; }
+    catch (e) { return false; }
+  }
+  function addBanner() {
+    if (!document.body || document.getElementById("sbDemoBar")) return false;
+    var tip = canPersist()
+      ? "数据只保存在这台浏览器，示例均为虚构；无需登录、无需建表。"
+      : "当前环境禁用了本地存储，刷新后数据会重置；示例均为虚构。";
+    var bar = document.createElement("div");
+    bar.id = "sbDemoBar";
+    bar.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:99999;max-width:330px;" +
+      "padding:14px 16px;border-radius:12px;background:#fffdf5;border:1px solid #e8d9a8;" +
+      "box-shadow:0 8px 28px rgba(60,50,20,.16);font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#4a4128";
+    bar.innerHTML =
+      '<div style="font-weight:700;font-size:14px;margin-bottom:4px">🎯 演示模式</div>' +
+      '<div>' + tip + '</div>' +
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button id="sbDemoReset" style="border:1px solid #d9c98f;background:#fff;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px">重置演示数据</button>' +
+      '<a href="https://github.com/mzc91992-afk/strategy-board-skill#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B" target="_blank" rel="noopener" style="color:#8a6d1f;font-size:12px;align-self:center">接入自己的云 ↗</a>' +
+      '<button id="sbDemoClose" title="关闭" style="margin-left:auto;border:0;background:transparent;cursor:pointer;font-size:16px;color:#9c8c60">×</button>' +
+      '</div>';
+    document.body.appendChild(bar);
+    var reset = document.getElementById("sbDemoReset");
+    if (reset) reset.onclick = function () { sDel(KEY); location.reload(); };
+    var close = document.getElementById("sbDemoClose");
+    if (close) close.onclick = function () { bar.remove(); };
+    return true;
+  }
+  var tries = 0;
+  var timer = setInterval(function () {
+    if (addBanner() || ++tries > 40) clearInterval(timer);
+  }, 100);
+})();
+/* ===================== DEMO ADAPTER END ===================== */
+
 const STALE_DAYS = 21;
 
 /* 页面可能被嵌在沙箱 iframe（缺 allow-same-origin）里，此时触碰 localStorage 会直接抛异常。

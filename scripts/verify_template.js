@@ -47,13 +47,23 @@ check(!hasRealKey, "未夹带真实发布密钥");
 check(!/\.app\.workbuddy\.host\b/.test(html), "未夹带内部部署域名");
 check(!/wbapp_[A-Za-z0-9]{16,}/.test(html), "未夹带应用 ID");
 
-// 4. 占位符（WARN：本地副本填了真实配置是正常的）
+// 4. 零配置演示模式
+check(/DEMO ADAPTER START/.test(html) && /DEMO ADAPTER END/.test(html), "演示模式适配层完整");
+check(/window\.SB_DEMO\s*=/.test(html), "演示模式开关已定义");
+check(/window\.WorkBuddyCloud\s*=\s*\{\s*createWorkBuddyCloud/.test(html), "本地数据层拦截已就位");
+check(/localStorage\.getItem\("sb_demo_db_v1"\)|sGet\(KEY\)/.test(html), "本机持久化已实现");
+
+// 5. 占位符（WARN：本地副本填了真实配置是正常的）
 const placeholders = [
   ["endpoint 仍为占位地址", /endpoint:\s*"https:\/\/your-board\.example\.com"/],
   ["publishableKey 仍为占位值", /publishableKey:\s*"REPLACE_WITH_YOUR_PUBLISHABLE_KEY"/],
 ];
 for (const [label, re] of placeholders) {
-  results.push({ ok: true, label, detail: re.test(html) ? "占位态，可发布" : "已填入实际配置（公开发布前请还原为占位值）", level: "WARN" });
+  results.push({
+    ok: true, label,
+    detail: re.test(html) ? "占位态，双击即进演示模式，可发布" : "已填入实际配置（公开发布前请还原为占位值）",
+    level: "WARN"
+  });
 }
 
 // 5. 内联脚本语法（失败仅告警，因为模板含压缩 SDK，部分语法依赖运行时环境）
